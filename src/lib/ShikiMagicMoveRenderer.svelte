@@ -33,7 +33,6 @@
 			if (props.animate) {
 				if (props.previous) renderer.replace(props.previous)
 				props.onStart?.()
-				// this should animate but doesn't
 				await renderer.render(props.tokens)
 				props.onEnd?.()
 			} else {
@@ -46,7 +45,7 @@
 
 <pre bind:this={container} class="shiki-magic-move-container">
   <!-- render initial tokens for SSR -->
-  <!-- {#if !isMounted}
+  {#if !isMounted}
 		{#each props.tokens.tokens as token}
 			{#if token.content === '\n'}
 				<br />
@@ -55,5 +54,5 @@
         {token.content}
       </span>
 		{/each}
-	{/if} -->
+	{/if}
 </pre>

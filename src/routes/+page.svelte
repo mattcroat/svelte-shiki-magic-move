@@ -4,19 +4,41 @@
 
 	let highlighter = getHighlighter({
 		themes: ['poimandres'],
-		langs: ['javascript', 'typescript'],
+		langs: ['svelte'],
 	})
-	let code = $state(`const hello = 'world'`)
+
+	let code = $state(
+		`
+<script>
+  let count = 0
+  $: double = count * 2
+<\/script>
+
+<button on:click={() => count++}>
+  {double}
+</button>
+`.trim()
+	)
 
 	function animate() {
-		code = `let hi = 'hello'`
+		code = `
+<script>
+  let count = $state(0)
+  let double = $derived(count * 2)
+<\/script>
+
+<button onclick={() => count++}>
+  {double}
+</button>
+`.trim()
 	}
 </script>
 
 {#await highlighter then highlighter}
 	<ShikiMagicMove
-		lang="ts"
+		lang="svelte"
 		theme="poimandres"
+		options={{ duration: 1000, stagger: 1 }}
 		onStart={() => console.log('start')}
 		onEnd={() => console.log('end')}
 		{highlighter}
