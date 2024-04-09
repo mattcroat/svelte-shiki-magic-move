@@ -25,7 +25,6 @@
 		props.options
 	)
 	const result = $derived(machine.commit(props.code))
-	$inspect(result)
 </script>
 
 <ShikiMagicMoveRenderer

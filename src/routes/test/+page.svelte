@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte'
+	import { onMount } from 'svelte'
 	import { getHighlighter, type HighlighterCore } from 'shiki'
 	import { codeToKeyedTokens, createMagicMoveMachine } from 'shiki-magic-move/core'
 	import { MagicMoveRenderer } from 'shiki-magic-move/renderer'
@@ -29,9 +29,7 @@
 	async function render() {
 		if (!result) return
 		if (result.previous) renderer.replace(result.previous)
-		await tick()
 		await renderer.render(result.current)
-		await tick()
 	}
 
 	function getResult() {
