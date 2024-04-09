@@ -1,51 +1,48 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
-	import { getHighlighter, type HighlighterCore } from 'shiki'
+	import { onMount, tick } from 'svelte'
+	import type { BundledLanguage, SpecialLanguage } from 'shiki'
 	import { codeToKeyedTokens, createMagicMoveMachine } from 'shiki-magic-move/core'
 	import { MagicMoveRenderer } from 'shiki-magic-move/renderer'
+	import type { MagicMoveDifferOptions, MagicMoveRenderOptions } from 'shiki-magic-move/types'
+	import highlighter from './highlighter'
+
+	export let code = 'let bool;'
+	export let lang: BundledLanguage | SpecialLanguage = 'ts'
+	export let theme = 'poimandres'
+	export let options: MagicMoveRenderOptions & MagicMoveDifferOptions = {
+		duration: 1000,
+		stagger: 3,
+	}
 
 	let container: HTMLPreElement
-	let highlighter: HighlighterCore
-	let code = `const hello = 'world'`
-	let lang = 'ts'
-	let theme = 'poimandres'
-	let options = {}
-
-	$: machine = createMagicMoveMachine(
-		(code) => codeToKeyedTokens(highlighter, code, { lang, theme }),
-		options
-	)
-	$: result = getResult(code, highlighter)
-	$: renderer = getRenderer(container)
-	$: render(result)
+	let machine: ReturnType<typeof createMagicMoveMachine>
+	let renderer: MagicMoveRenderer
 
 	onMount(async () => {
-		highlighter = await getHighlighter({
-			themes: ['poimandres'],
-			langs: ['javascript', 'typescript'],
-		})
+		machine = createMagicMoveMachine(
+			(code) => codeToKeyedTokens(highlighter, code, { lang, theme }),
+			options
+		)
+		renderer = new MagicMoveRenderer(container)
 	})
 
 	async function render() {
-		if (!result) return
+		const result = machine.commit(code)
+		Object.assign(renderer.options, options)
 		if (result.previous) renderer.replace(result.previous)
 		await renderer.render(result.current)
 	}
 
-	function getResult() {
-		if (!highlighter) return
-		return machine.commit(code)
-	}
-
-	function getRenderer() {
-		if (!container) return
-		return new MagicMoveRenderer(container)
-	}
-
-	function animate() {
-		code = `let hi = 'hello'`
+	$: if (highlighter && machine && code) {
+		render()
 	}
 </script>
 
 <pre bind:this={container} class="shiki-magic-move-container"></pre>
-<button on:click={animate}>Animate</button>
+<button
+	on:click={() => {
+		code = 'let bool = true;'
+	}}
+>
+	Animate
+</button>
